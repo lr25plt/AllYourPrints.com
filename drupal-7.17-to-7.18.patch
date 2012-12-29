@@ -1,0 +1,1887 @@
+diff -Naur drupal-7.17/CHANGELOG.txt drupal-7.18/CHANGELOG.txt
+--- drupal-7.17/CHANGELOG.txt	2012-11-07 22:42:13.000000000 +0100
++++ drupal-7.18/CHANGELOG.txt	2012-12-19 19:52:59.000000000 +0100
+@@ -1,3 +1,6 @@
++Drupal 7.18, 2012-12-19
++-----------------------
++- Fixed security issues (multiple vulnerabilities). See SA-CORE-2012-004.
+ 
+ Drupal 7.17, 2012-11-07
+ -----------------------
+diff -Naur drupal-7.17/includes/bootstrap.inc drupal-7.18/includes/bootstrap.inc
+--- drupal-7.17/includes/bootstrap.inc	2012-11-07 22:42:13.000000000 +0100
++++ drupal-7.18/includes/bootstrap.inc	2012-12-19 19:52:59.000000000 +0100
+@@ -8,7 +8,7 @@
+ /**
+  * The current system version.
+  */
+-define('VERSION', '7.17');
++define('VERSION', '7.18');
+ 
+ /**
+  * Core API compatibility.
+diff -Naur drupal-7.17/includes/file.inc drupal-7.18/includes/file.inc
+--- drupal-7.17/includes/file.inc	2012-11-07 22:42:13.000000000 +0100
++++ drupal-7.18/includes/file.inc	2012-12-19 19:52:59.000000000 +0100
+@@ -1113,6 +1113,9 @@
+ 
+   // Allow potentially insecure uploads for very savvy users and admin
+   if (!variable_get('allow_insecure_uploads', 0)) {
++    // Remove any null bytes. See http://php.net/manual/en/security.filesystem.nullbytes.php
++    $filename = str_replace(chr(0), '', $filename);
++
+     $whitelist = array_unique(explode(' ', trim($extensions)));
+ 
+     // Split the filename up by periods. The first part becomes the basename
+diff -Naur drupal-7.17/modules/aggregator/aggregator.info drupal-7.18/modules/aggregator/aggregator.info
+--- drupal-7.17/modules/aggregator/aggregator.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/aggregator/aggregator.info	2012-12-19 20:06:43.000000000 +0100
+@@ -7,8 +7,8 @@
+ configure = admin/config/services/aggregator/settings
+ stylesheets[all][] = aggregator.css
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/aggregator/tests/aggregator_test.info drupal-7.18/modules/aggregator/tests/aggregator_test.info
+--- drupal-7.17/modules/aggregator/tests/aggregator_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/aggregator/tests/aggregator_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/block/block.info drupal-7.18/modules/block/block.info
+--- drupal-7.17/modules/block/block.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/block/block.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ files[] = block.test
+ configure = admin/structure/block
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/block/tests/block_test.info drupal-7.18/modules/block/tests/block_test.info
+--- drupal-7.17/modules/block/tests/block_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/block/tests/block_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/block/tests/themes/block_test_theme/block_test_theme.info drupal-7.18/modules/block/tests/themes/block_test_theme/block_test_theme.info
+--- drupal-7.17/modules/block/tests/themes/block_test_theme/block_test_theme.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/block/tests/themes/block_test_theme/block_test_theme.info	2012-12-19 20:06:43.000000000 +0100
+@@ -13,8 +13,8 @@
+ regions[highlighted] = Highlighted
+ regions[help] = Help
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/blog/blog.info drupal-7.18/modules/blog/blog.info
+--- drupal-7.17/modules/blog/blog.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/blog/blog.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ files[] = blog.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/book/book.info drupal-7.18/modules/book/book.info
+--- drupal-7.17/modules/book/book.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/book/book.info	2012-12-19 20:06:43.000000000 +0100
+@@ -7,8 +7,8 @@
+ configure = admin/content/book/settings
+ stylesheets[all][] = book.css
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/color/color.info drupal-7.18/modules/color/color.info
+--- drupal-7.17/modules/color/color.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/color/color.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ files[] = color.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/comment/comment.info drupal-7.18/modules/comment/comment.info
+--- drupal-7.17/modules/comment/comment.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/comment/comment.info	2012-12-19 20:06:43.000000000 +0100
+@@ -9,8 +9,8 @@
+ configure = admin/content/comment
+ stylesheets[all][] = comment.css
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/contact/contact.info drupal-7.18/modules/contact/contact.info
+--- drupal-7.17/modules/contact/contact.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/contact/contact.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ files[] = contact.test
+ configure = admin/structure/contact
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/contextual/contextual.info drupal-7.18/modules/contextual/contextual.info
+--- drupal-7.17/modules/contextual/contextual.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/contextual/contextual.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ files[] = contextual.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/dashboard/dashboard.info drupal-7.18/modules/dashboard/dashboard.info
+--- drupal-7.17/modules/dashboard/dashboard.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/dashboard/dashboard.info	2012-12-19 20:06:43.000000000 +0100
+@@ -7,8 +7,8 @@
+ dependencies[] = block
+ configure = admin/dashboard/customize
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/dblog/dblog.info drupal-7.18/modules/dblog/dblog.info
+--- drupal-7.17/modules/dblog/dblog.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/dblog/dblog.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ files[] = dblog.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/field/field.info drupal-7.18/modules/field/field.info
+--- drupal-7.17/modules/field/field.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/field/field.info	2012-12-19 20:06:43.000000000 +0100
+@@ -10,8 +10,8 @@
+ required = TRUE
+ stylesheets[all][] = theme/field.css
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/field/modules/field_sql_storage/field_sql_storage.info drupal-7.18/modules/field/modules/field_sql_storage/field_sql_storage.info
+--- drupal-7.17/modules/field/modules/field_sql_storage/field_sql_storage.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/field/modules/field_sql_storage/field_sql_storage.info	2012-12-19 20:06:43.000000000 +0100
+@@ -7,8 +7,8 @@
+ files[] = field_sql_storage.test
+ required = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/field/modules/list/list.info drupal-7.18/modules/field/modules/list/list.info
+--- drupal-7.17/modules/field/modules/list/list.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/field/modules/list/list.info	2012-12-19 20:06:43.000000000 +0100
+@@ -7,8 +7,8 @@
+ dependencies[] = options
+ files[] = tests/list.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/field/modules/list/tests/list_test.info drupal-7.18/modules/field/modules/list/tests/list_test.info
+--- drupal-7.17/modules/field/modules/list/tests/list_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/field/modules/list/tests/list_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ version = VERSION
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/field/modules/number/number.info drupal-7.18/modules/field/modules/number/number.info
+--- drupal-7.17/modules/field/modules/number/number.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/field/modules/number/number.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ dependencies[] = field
+ files[] = number.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/field/modules/options/options.info drupal-7.18/modules/field/modules/options/options.info
+--- drupal-7.17/modules/field/modules/options/options.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/field/modules/options/options.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ dependencies[] = field
+ files[] = options.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/field/modules/text/text.info drupal-7.18/modules/field/modules/text/text.info
+--- drupal-7.17/modules/field/modules/text/text.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/field/modules/text/text.info	2012-12-19 20:06:43.000000000 +0100
+@@ -7,8 +7,8 @@
+ files[] = text.test
+ required = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/field/tests/field_test.info drupal-7.18/modules/field/tests/field_test.info
+--- drupal-7.17/modules/field/tests/field_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/field/tests/field_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ version = VERSION
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/field_ui/field_ui.info drupal-7.18/modules/field_ui/field_ui.info
+--- drupal-7.17/modules/field_ui/field_ui.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/field_ui/field_ui.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ dependencies[] = field
+ files[] = field_ui.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/file/file.info drupal-7.18/modules/file/file.info
+--- drupal-7.17/modules/file/file.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/file/file.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ dependencies[] = field
+ files[] = tests/file.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/file/tests/file_module_test.info drupal-7.18/modules/file/tests/file_module_test.info
+--- drupal-7.17/modules/file/tests/file_module_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/file/tests/file_module_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/filter/filter.info drupal-7.18/modules/filter/filter.info
+--- drupal-7.17/modules/filter/filter.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/filter/filter.info	2012-12-19 20:06:43.000000000 +0100
+@@ -7,8 +7,8 @@
+ required = TRUE
+ configure = admin/config/content/formats
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/forum/forum.info drupal-7.18/modules/forum/forum.info
+--- drupal-7.17/modules/forum/forum.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/forum/forum.info	2012-12-19 20:06:43.000000000 +0100
+@@ -9,8 +9,8 @@
+ configure = admin/structure/forum
+ stylesheets[all][] = forum.css
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/help/help.info drupal-7.18/modules/help/help.info
+--- drupal-7.17/modules/help/help.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/help/help.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ files[] = help.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/image/image.info drupal-7.18/modules/image/image.info
+--- drupal-7.17/modules/image/image.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/image/image.info	2012-12-19 20:06:43.000000000 +0100
+@@ -7,8 +7,8 @@
+ files[] = image.test
+ configure = admin/config/media/image-styles
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/image/tests/image_module_test.info drupal-7.18/modules/image/tests/image_module_test.info
+--- drupal-7.17/modules/image/tests/image_module_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/image/tests/image_module_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ files[] = image_module_test.module
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/locale/locale.info drupal-7.18/modules/locale/locale.info
+--- drupal-7.17/modules/locale/locale.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/locale/locale.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ files[] = locale.test
+ configure = admin/config/regional/language
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/locale/tests/locale_test.info drupal-7.18/modules/locale/tests/locale_test.info
+--- drupal-7.17/modules/locale/tests/locale_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/locale/tests/locale_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ version = VERSION
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/menu/menu.info drupal-7.18/modules/menu/menu.info
+--- drupal-7.17/modules/menu/menu.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/menu/menu.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ files[] = menu.test
+ configure = admin/structure/menu
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/node/node.info drupal-7.18/modules/node/node.info
+--- drupal-7.17/modules/node/node.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/node/node.info	2012-12-19 20:06:43.000000000 +0100
+@@ -9,8 +9,8 @@
+ configure = admin/structure/types
+ stylesheets[all][] = node.css
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/node/tests/node_access_test.info drupal-7.18/modules/node/tests/node_access_test.info
+--- drupal-7.17/modules/node/tests/node_access_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/node/tests/node_access_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/node/tests/node_test.info drupal-7.18/modules/node/tests/node_test.info
+--- drupal-7.17/modules/node/tests/node_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/node/tests/node_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/node/tests/node_test_exception.info drupal-7.18/modules/node/tests/node_test_exception.info
+--- drupal-7.17/modules/node/tests/node_test_exception.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/node/tests/node_test_exception.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/openid/openid.info drupal-7.18/modules/openid/openid.info
+--- drupal-7.17/modules/openid/openid.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/openid/openid.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ files[] = openid.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/openid/tests/openid_test.info drupal-7.18/modules/openid/tests/openid_test.info
+--- drupal-7.17/modules/openid/tests/openid_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/openid/tests/openid_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ dependencies[] = openid
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/overlay/overlay.info drupal-7.18/modules/overlay/overlay.info
+--- drupal-7.17/modules/overlay/overlay.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/overlay/overlay.info	2012-12-19 20:06:43.000000000 +0100
+@@ -4,8 +4,8 @@
+ version = VERSION
+ core = 7.x
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/path/path.info drupal-7.18/modules/path/path.info
+--- drupal-7.17/modules/path/path.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/path/path.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ files[] = path.test
+ configure = admin/config/search/path
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/php/php.info drupal-7.18/modules/php/php.info
+--- drupal-7.17/modules/php/php.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/php/php.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ files[] = php.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/poll/poll.info drupal-7.18/modules/poll/poll.info
+--- drupal-7.17/modules/poll/poll.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/poll/poll.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ files[] = poll.test
+ stylesheets[all][] = poll.css
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/profile/profile.info drupal-7.18/modules/profile/profile.info
+--- drupal-7.17/modules/profile/profile.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/profile/profile.info	2012-12-19 20:06:43.000000000 +0100
+@@ -11,8 +11,8 @@
+ ; See user_system_info_alter().
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/rdf/rdf.info drupal-7.18/modules/rdf/rdf.info
+--- drupal-7.17/modules/rdf/rdf.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/rdf/rdf.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ files[] = rdf.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/rdf/tests/rdf_test.info drupal-7.18/modules/rdf/tests/rdf_test.info
+--- drupal-7.17/modules/rdf/tests/rdf_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/rdf/tests/rdf_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/search/search.info drupal-7.18/modules/search/search.info
+--- drupal-7.17/modules/search/search.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/search/search.info	2012-12-19 20:06:43.000000000 +0100
+@@ -8,8 +8,8 @@
+ configure = admin/config/search/settings
+ stylesheets[all][] = search.css
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/search/tests/search_embedded_form.info drupal-7.18/modules/search/tests/search_embedded_form.info
+--- drupal-7.17/modules/search/tests/search_embedded_form.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/search/tests/search_embedded_form.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/search/tests/search_extra_type.info drupal-7.18/modules/search/tests/search_extra_type.info
+--- drupal-7.17/modules/search/tests/search_extra_type.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/search/tests/search_extra_type.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/shortcut/shortcut.info drupal-7.18/modules/shortcut/shortcut.info
+--- drupal-7.17/modules/shortcut/shortcut.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/shortcut/shortcut.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ files[] = shortcut.test
+ configure = admin/config/user-interface/shortcut
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/simpletest.info drupal-7.18/modules/simpletest/simpletest.info
+--- drupal-7.17/modules/simpletest/simpletest.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/simpletest.info	2012-12-19 20:06:43.000000000 +0100
+@@ -55,8 +55,8 @@
+ files[] = tests/upgrade/update.field.test
+ files[] = tests/upgrade/update.user.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/actions_loop_test.info drupal-7.18/modules/simpletest/tests/actions_loop_test.info
+--- drupal-7.17/modules/simpletest/tests/actions_loop_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/actions_loop_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/ajax_forms_test.info drupal-7.18/modules/simpletest/tests/ajax_forms_test.info
+--- drupal-7.17/modules/simpletest/tests/ajax_forms_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/ajax_forms_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ version = VERSION
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/ajax_test.info drupal-7.18/modules/simpletest/tests/ajax_test.info
+--- drupal-7.17/modules/simpletest/tests/ajax_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/ajax_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/batch_test.info drupal-7.18/modules/simpletest/tests/batch_test.info
+--- drupal-7.17/modules/simpletest/tests/batch_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/batch_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/common_test.info drupal-7.18/modules/simpletest/tests/common_test.info
+--- drupal-7.17/modules/simpletest/tests/common_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/common_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -7,8 +7,8 @@
+ stylesheets[print][] = common_test.print.css
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/common_test_cron_helper.info drupal-7.18/modules/simpletest/tests/common_test_cron_helper.info
+--- drupal-7.17/modules/simpletest/tests/common_test_cron_helper.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/common_test_cron_helper.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/database_test.info drupal-7.18/modules/simpletest/tests/database_test.info
+--- drupal-7.17/modules/simpletest/tests/database_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/database_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ version = VERSION
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/drupal_system_listing_compatible_test/drupal_system_listing_compatible_test.info drupal-7.18/modules/simpletest/tests/drupal_system_listing_compatible_test/drupal_system_listing_compatible_test.info
+--- drupal-7.17/modules/simpletest/tests/drupal_system_listing_compatible_test/drupal_system_listing_compatible_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/drupal_system_listing_compatible_test/drupal_system_listing_compatible_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/drupal_system_listing_incompatible_test/drupal_system_listing_incompatible_test.info drupal-7.18/modules/simpletest/tests/drupal_system_listing_incompatible_test/drupal_system_listing_incompatible_test.info
+--- drupal-7.17/modules/simpletest/tests/drupal_system_listing_incompatible_test/drupal_system_listing_incompatible_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/drupal_system_listing_incompatible_test/drupal_system_listing_incompatible_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/entity_cache_test.info drupal-7.18/modules/simpletest/tests/entity_cache_test.info
+--- drupal-7.17/modules/simpletest/tests/entity_cache_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/entity_cache_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ dependencies[] = entity_cache_test_dependency
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/entity_cache_test_dependency.info drupal-7.18/modules/simpletest/tests/entity_cache_test_dependency.info
+--- drupal-7.17/modules/simpletest/tests/entity_cache_test_dependency.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/entity_cache_test_dependency.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/entity_crud_hook_test.info drupal-7.18/modules/simpletest/tests/entity_crud_hook_test.info
+--- drupal-7.17/modules/simpletest/tests/entity_crud_hook_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/entity_crud_hook_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ version = VERSION
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/entity_query_access_test.info drupal-7.18/modules/simpletest/tests/entity_query_access_test.info
+--- drupal-7.17/modules/simpletest/tests/entity_query_access_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/entity_query_access_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/error_test.info drupal-7.18/modules/simpletest/tests/error_test.info
+--- drupal-7.17/modules/simpletest/tests/error_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/error_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/file_test.info drupal-7.18/modules/simpletest/tests/file_test.info
+--- drupal-7.17/modules/simpletest/tests/file_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/file_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ files[] = file_test.module
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/filter_test.info drupal-7.18/modules/simpletest/tests/filter_test.info
+--- drupal-7.17/modules/simpletest/tests/filter_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/filter_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/form_test.info drupal-7.18/modules/simpletest/tests/form_test.info
+--- drupal-7.17/modules/simpletest/tests/form_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/form_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/image_test.info drupal-7.18/modules/simpletest/tests/image_test.info
+--- drupal-7.17/modules/simpletest/tests/image_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/image_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/menu_test.info drupal-7.18/modules/simpletest/tests/menu_test.info
+--- drupal-7.17/modules/simpletest/tests/menu_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/menu_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/module_test.info drupal-7.18/modules/simpletest/tests/module_test.info
+--- drupal-7.17/modules/simpletest/tests/module_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/module_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/path_test.info drupal-7.18/modules/simpletest/tests/path_test.info
+--- drupal-7.17/modules/simpletest/tests/path_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/path_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/requirements1_test.info drupal-7.18/modules/simpletest/tests/requirements1_test.info
+--- drupal-7.17/modules/simpletest/tests/requirements1_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/requirements1_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/requirements2_test.info drupal-7.18/modules/simpletest/tests/requirements2_test.info
+--- drupal-7.17/modules/simpletest/tests/requirements2_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/requirements2_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -7,8 +7,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/session_test.info drupal-7.18/modules/simpletest/tests/session_test.info
+--- drupal-7.17/modules/simpletest/tests/session_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/session_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/system_dependencies_test.info drupal-7.18/modules/simpletest/tests/system_dependencies_test.info
+--- drupal-7.17/modules/simpletest/tests/system_dependencies_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/system_dependencies_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ hidden = TRUE
+ dependencies[] = _missing_dependency
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/system_incompatible_core_version_dependencies_test.info drupal-7.18/modules/simpletest/tests/system_incompatible_core_version_dependencies_test.info
+--- drupal-7.17/modules/simpletest/tests/system_incompatible_core_version_dependencies_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/system_incompatible_core_version_dependencies_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ hidden = TRUE
+ dependencies[] = system_incompatible_core_version_test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/system_incompatible_core_version_test.info drupal-7.18/modules/simpletest/tests/system_incompatible_core_version_test.info
+--- drupal-7.17/modules/simpletest/tests/system_incompatible_core_version_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/system_incompatible_core_version_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 5.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/system_incompatible_module_version_dependencies_test.info drupal-7.18/modules/simpletest/tests/system_incompatible_module_version_dependencies_test.info
+--- drupal-7.17/modules/simpletest/tests/system_incompatible_module_version_dependencies_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/system_incompatible_module_version_dependencies_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -7,8 +7,8 @@
+ ; system_incompatible_module_version_test declares version 1.0
+ dependencies[] = system_incompatible_module_version_test (>2.0)
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/system_incompatible_module_version_test.info drupal-7.18/modules/simpletest/tests/system_incompatible_module_version_test.info
+--- drupal-7.17/modules/simpletest/tests/system_incompatible_module_version_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/system_incompatible_module_version_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/system_test.info drupal-7.18/modules/simpletest/tests/system_test.info
+--- drupal-7.17/modules/simpletest/tests/system_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/system_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ files[] = system_test.module
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/taxonomy_test.info drupal-7.18/modules/simpletest/tests/taxonomy_test.info
+--- drupal-7.17/modules/simpletest/tests/taxonomy_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/taxonomy_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ hidden = TRUE
+ dependencies[] = taxonomy
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/theme_test.info drupal-7.18/modules/simpletest/tests/theme_test.info
+--- drupal-7.17/modules/simpletest/tests/theme_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/theme_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/themes/test_basetheme/test_basetheme.info drupal-7.18/modules/simpletest/tests/themes/test_basetheme/test_basetheme.info
+--- drupal-7.17/modules/simpletest/tests/themes/test_basetheme/test_basetheme.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/themes/test_basetheme/test_basetheme.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ settings[basetheme_only] = base theme value
+ settings[subtheme_override] = base theme value
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/themes/test_subtheme/test_subtheme.info drupal-7.18/modules/simpletest/tests/themes/test_subtheme/test_subtheme.info
+--- drupal-7.17/modules/simpletest/tests/themes/test_subtheme/test_subtheme.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/themes/test_subtheme/test_subtheme.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ 
+ settings[subtheme_override] = subtheme value
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/themes/test_theme/test_theme.info drupal-7.18/modules/simpletest/tests/themes/test_theme/test_theme.info
+--- drupal-7.17/modules/simpletest/tests/themes/test_theme/test_theme.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/themes/test_theme/test_theme.info	2012-12-19 20:06:43.000000000 +0100
+@@ -17,8 +17,8 @@
+ 
+ settings[theme_test_setting] = default value
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/update_script_test.info drupal-7.18/modules/simpletest/tests/update_script_test.info
+--- drupal-7.17/modules/simpletest/tests/update_script_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/update_script_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/update_test_1.info drupal-7.18/modules/simpletest/tests/update_test_1.info
+--- drupal-7.17/modules/simpletest/tests/update_test_1.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/update_test_1.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/update_test_2.info drupal-7.18/modules/simpletest/tests/update_test_2.info
+--- drupal-7.17/modules/simpletest/tests/update_test_2.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/update_test_2.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/update_test_3.info drupal-7.18/modules/simpletest/tests/update_test_3.info
+--- drupal-7.17/modules/simpletest/tests/update_test_3.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/update_test_3.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/url_alter_test.info drupal-7.18/modules/simpletest/tests/url_alter_test.info
+--- drupal-7.17/modules/simpletest/tests/url_alter_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/url_alter_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ version = VERSION
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/simpletest/tests/xmlrpc_test.info drupal-7.18/modules/simpletest/tests/xmlrpc_test.info
+--- drupal-7.17/modules/simpletest/tests/xmlrpc_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/simpletest/tests/xmlrpc_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/statistics/statistics.info drupal-7.18/modules/statistics/statistics.info
+--- drupal-7.17/modules/statistics/statistics.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/statistics/statistics.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ files[] = statistics.test
+ configure = admin/config/system/statistics
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/syslog/syslog.info drupal-7.18/modules/syslog/syslog.info
+--- drupal-7.17/modules/syslog/syslog.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/syslog/syslog.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ files[] = syslog.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/system/system.info drupal-7.18/modules/system/system.info
+--- drupal-7.17/modules/system/system.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/system/system.info	2012-12-19 20:06:43.000000000 +0100
+@@ -12,8 +12,8 @@
+ required = TRUE
+ configure = admin/config/system
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/taxonomy/taxonomy.info drupal-7.18/modules/taxonomy/taxonomy.info
+--- drupal-7.17/modules/taxonomy/taxonomy.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/taxonomy/taxonomy.info	2012-12-19 20:06:43.000000000 +0100
+@@ -8,8 +8,8 @@
+ files[] = taxonomy.test
+ configure = admin/structure/taxonomy
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/toolbar/toolbar.info drupal-7.18/modules/toolbar/toolbar.info
+--- drupal-7.17/modules/toolbar/toolbar.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/toolbar/toolbar.info	2012-12-19 20:06:43.000000000 +0100
+@@ -4,8 +4,8 @@
+ package = Core
+ version = VERSION
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/tracker/tracker.info drupal-7.18/modules/tracker/tracker.info
+--- drupal-7.17/modules/tracker/tracker.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/tracker/tracker.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ core = 7.x
+ files[] = tracker.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/translation/tests/translation_test.info drupal-7.18/modules/translation/tests/translation_test.info
+--- drupal-7.17/modules/translation/tests/translation_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/translation/tests/translation_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ version = VERSION
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/translation/translation.info drupal-7.18/modules/translation/translation.info
+--- drupal-7.17/modules/translation/translation.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/translation/translation.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ core = 7.x
+ files[] = translation.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/trigger/tests/trigger_test.info drupal-7.18/modules/trigger/tests/trigger_test.info
+--- drupal-7.17/modules/trigger/tests/trigger_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/trigger/tests/trigger_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -4,8 +4,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/trigger/trigger.info drupal-7.18/modules/trigger/trigger.info
+--- drupal-7.17/modules/trigger/trigger.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/trigger/trigger.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ files[] = trigger.test
+ configure = admin/structure/trigger
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/update/tests/aaa_update_test.info drupal-7.18/modules/update/tests/aaa_update_test.info
+--- drupal-7.17/modules/update/tests/aaa_update_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/update/tests/aaa_update_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -4,8 +4,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/update/tests/bbb_update_test.info drupal-7.18/modules/update/tests/bbb_update_test.info
+--- drupal-7.17/modules/update/tests/bbb_update_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/update/tests/bbb_update_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -4,8 +4,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/update/tests/ccc_update_test.info drupal-7.18/modules/update/tests/ccc_update_test.info
+--- drupal-7.17/modules/update/tests/ccc_update_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/update/tests/ccc_update_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -4,8 +4,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/update/tests/themes/update_test_basetheme/update_test_basetheme.info drupal-7.18/modules/update/tests/themes/update_test_basetheme/update_test_basetheme.info
+--- drupal-7.17/modules/update/tests/themes/update_test_basetheme/update_test_basetheme.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/update/tests/themes/update_test_basetheme/update_test_basetheme.info	2012-12-19 20:06:43.000000000 +0100
+@@ -3,8 +3,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/update/tests/themes/update_test_subtheme/update_test_subtheme.info drupal-7.18/modules/update/tests/themes/update_test_subtheme/update_test_subtheme.info
+--- drupal-7.17/modules/update/tests/themes/update_test_subtheme/update_test_subtheme.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/update/tests/themes/update_test_subtheme/update_test_subtheme.info	2012-12-19 20:06:43.000000000 +0100
+@@ -4,8 +4,8 @@
+ base theme = update_test_basetheme
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/update/tests/update_test.info drupal-7.18/modules/update/tests/update_test.info
+--- drupal-7.17/modules/update/tests/update_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/update/tests/update_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/update/update.info drupal-7.18/modules/update/update.info
+--- drupal-7.17/modules/update/update.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/update/update.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ files[] = update.test
+ configure = admin/reports/updates/settings
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/user/tests/user_form_test.info drupal-7.18/modules/user/tests/user_form_test.info
+--- drupal-7.17/modules/user/tests/user_form_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/user/tests/user_form_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/user/user.info drupal-7.18/modules/user/user.info
+--- drupal-7.17/modules/user/user.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/modules/user/user.info	2012-12-19 20:06:43.000000000 +0100
+@@ -9,8 +9,8 @@
+ configure = admin/config/people
+ stylesheets[all][] = user.css
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/modules/user/user.module drupal-7.18/modules/user/user.module
+--- drupal-7.17/modules/user/user.module	2012-11-07 22:42:13.000000000 +0100
++++ drupal-7.18/modules/user/user.module	2012-12-19 19:52:59.000000000 +0100
+@@ -933,14 +933,18 @@
+   $query = db_select('users')->extend('PagerDefault');
+   $query->fields('users', array('uid'));
+   if (user_access('administer users')) {
+-    // Administrators can also search in the otherwise private email field.
++    // Administrators can also search in the otherwise private email field,
++    // and they don't need to be restricted to only active users.
+     $query->fields('users', array('mail'));
+     $query->condition(db_or()->
+       condition('name', '%' . db_like($keys) . '%', 'LIKE')->
+       condition('mail', '%' . db_like($keys) . '%', 'LIKE'));
+   }
+   else {
+-    $query->condition('name', '%' . db_like($keys) . '%', 'LIKE');
++    // Regular users can only search via usernames, and we do not show them
++    // blocked accounts.
++    $query->condition('name', '%' . db_like($keys) . '%', 'LIKE')
++      ->condition('status', 1);
+   }
+   $uids = $query
+     ->limit(15)
+diff -Naur drupal-7.17/modules/user/user.test drupal-7.18/modules/user/user.test
+--- drupal-7.17/modules/user/user.test	2012-11-07 22:42:13.000000000 +0100
++++ drupal-7.18/modules/user/user.test	2012-12-19 19:52:59.000000000 +0100
+@@ -2106,7 +2106,7 @@
+   public static function getInfo() {
+     return array(
+       'name' => 'User search',
+-      'description' => 'Testing that only user with the right permission can see the email address in the user search.',
++      'description' => 'Tests the user search page and verifies that sensitive information is hidden from unauthorized users.',
+       'group' => 'User',
+     );
+   }
+@@ -2126,11 +2126,29 @@
+     $edit = array('keys' => $keys);
+     $this->drupalPost('search/user/', $edit, t('Search'));
+     $this->assertText($keys);
++
++    // Create a blocked user.
++    $blocked_user = $this->drupalCreateUser();
++    $edit = array('status' => 0);
++    $blocked_user = user_save($blocked_user, $edit);
++
++    // Verify that users with "administer users" permissions can see blocked
++    // accounts in search results.
++    $edit = array('keys' => $blocked_user->name);
++    $this->drupalPost('search/user/', $edit, t('Search'));
++    $this->assertText($blocked_user->name, 'Blocked users are listed on the user search results for users with the "administer users" permission.');
++
++    // Verify that users without "administer users" permissions do not see
++    // blocked accounts in search results.
++    $this->drupalLogin($user1);
++    $edit = array('keys' => $blocked_user->name);
++    $this->drupalPost('search/user/', $edit, t('Search'));
++    $this->assertNoText($blocked_user->name, 'Blocked users are hidden from the user search results.');
++
+     $this->drupalLogout();
+   }
+ }
+ 
+-
+ /**
+  * Test role assignment.
+  */
+diff -Naur drupal-7.17/profiles/minimal/minimal.info drupal-7.18/profiles/minimal/minimal.info
+--- drupal-7.17/profiles/minimal/minimal.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/profiles/minimal/minimal.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ dependencies[] = block
+ dependencies[] = dblog
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/profiles/standard/standard.info drupal-7.18/profiles/standard/standard.info
+--- drupal-7.17/profiles/standard/standard.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/profiles/standard/standard.info	2012-12-19 20:06:43.000000000 +0100
+@@ -24,8 +24,8 @@
+ dependencies[] = file
+ dependencies[] = rdf
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/profiles/testing/modules/drupal_system_listing_compatible_test/drupal_system_listing_compatible_test.info drupal-7.18/profiles/testing/modules/drupal_system_listing_compatible_test/drupal_system_listing_compatible_test.info
+--- drupal-7.17/profiles/testing/modules/drupal_system_listing_compatible_test/drupal_system_listing_compatible_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/profiles/testing/modules/drupal_system_listing_compatible_test/drupal_system_listing_compatible_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -6,8 +6,8 @@
+ hidden = TRUE
+ files[] = drupal_system_listing_compatible_test.test
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/profiles/testing/modules/drupal_system_listing_incompatible_test/drupal_system_listing_incompatible_test.info drupal-7.18/profiles/testing/modules/drupal_system_listing_incompatible_test/drupal_system_listing_incompatible_test.info
+--- drupal-7.17/profiles/testing/modules/drupal_system_listing_incompatible_test/drupal_system_listing_incompatible_test.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/profiles/testing/modules/drupal_system_listing_incompatible_test/drupal_system_listing_incompatible_test.info	2012-12-19 20:06:43.000000000 +0100
+@@ -8,8 +8,8 @@
+ core = 6.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/profiles/testing/testing.info drupal-7.18/profiles/testing/testing.info
+--- drupal-7.17/profiles/testing/testing.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/profiles/testing/testing.info	2012-12-19 20:06:43.000000000 +0100
+@@ -4,8 +4,8 @@
+ core = 7.x
+ hidden = TRUE
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/themes/bartik/bartik.info drupal-7.18/themes/bartik/bartik.info
+--- drupal-7.17/themes/bartik/bartik.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/themes/bartik/bartik.info	2012-12-19 20:06:43.000000000 +0100
+@@ -34,8 +34,8 @@
+ settings[shortcut_module_link] = 0
+ 
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/themes/garland/garland.info drupal-7.18/themes/garland/garland.info
+--- drupal-7.17/themes/garland/garland.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/themes/garland/garland.info	2012-12-19 20:06:43.000000000 +0100
+@@ -7,8 +7,8 @@
+ stylesheets[print][] = print.css
+ settings[garland_width] = fluid
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/themes/seven/seven.info drupal-7.18/themes/seven/seven.info
+--- drupal-7.17/themes/seven/seven.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/themes/seven/seven.info	2012-12-19 20:06:43.000000000 +0100
+@@ -13,8 +13,8 @@
+ regions[sidebar_first] = First sidebar
+ regions_hidden[] = sidebar_first
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
+diff -Naur drupal-7.17/themes/stark/stark.info drupal-7.18/themes/stark/stark.info
+--- drupal-7.17/themes/stark/stark.info	2012-11-07 22:55:57.000000000 +0100
++++ drupal-7.18/themes/stark/stark.info	2012-12-19 20:06:43.000000000 +0100
+@@ -5,8 +5,8 @@
+ core = 7.x
+ stylesheets[all][] = layout.css
+ 
+-; Information added by drupal.org packaging script on 2012-11-07
+-version = "7.17"
++; Information added by drupal.org packaging script on 2012-12-19
++version = "7.18"
+ project = "drupal"
+-datestamp = "1352325357"
++datestamp = "1355944003"
+ 
