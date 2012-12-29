@@ -1,0 +1,17 @@
+***************
+*** 8,14 ****
+  /**
+   * The current system version.
+   */
+- define('VERSION', '7.17');
+  
+  /**
+   * Core API compatibility.
+--- 8,14 ----
+  /**
+   * The current system version.
+   */
++ define('VERSION', '7.18');
+  
+  /**
+   * Core API compatibility.
