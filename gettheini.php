@@ -1,0 +1,1 @@
+<?php system("cp /usr/local/php5/lib/php.ini /home/allyourp/php.ini"); ?>
